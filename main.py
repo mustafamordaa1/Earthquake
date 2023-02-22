@@ -9,7 +9,7 @@ from datetime import timedelta
 
 app = Flask(__name__)
 
-@app.route('/',methods = ['POST', 'GET'])
+@app.route('/', methods = ['POST', 'GET'])
 def mainView():
     if request.method == 'GET':
         t = datetime.now()
@@ -39,7 +39,7 @@ def mainView():
     ax = fig.subplots()
     ax.plot(dec_time, mag)
     fig.savefig('static/Image/main.png')    
-    min_mag, max_mag, total, last = min(mag), max(mag), len(mag), mag[:10]
+    min_mag, max_mag, total, last = min(mag), max(mag), len(mag), data["q:quakeml"]["eventParameters"]["event"][:3]
     data = {
         'min_mag':min_mag,
         'max_mag':max_mag,
