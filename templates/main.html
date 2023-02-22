@@ -12,6 +12,9 @@
     <br/><br/>
     <button type="submit">Submit</button>
     </form>
-    <h1>last Earthquakes : {{data['last']}}</h1>
+    <h1>last Earthquakes :</h1>
+    {% for i in data['last'] %}
+    <h3>Magnitude : {{i['magnitude']['mag']['value']}}, time : {{i['origin']['time']['value']}}</h3>
+    {% endfor %}
 </body>
 </html>
