@@ -1,14 +1,26 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests
 import json
 import xmltodict
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from datetime import datetime
+from datetime import date
+from datetime import timedelta
 
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    URL = "https://www.seismicportal.eu/fdsnws/event/1/query?start=2023-2-18&end=2023-2-19&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+@app.route('/',methods = ['POST', 'GET'])
+def mainView():
+    if request.method == 'GET':
+        t = datetime.now()
+        today = date.today()
+        yesterday = today - timedelta(days = 1)
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={yesterday}T{t.hour -2 }:{t.minute}&end={today}T{t.hour -3 }:{t.minute}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+    elif request.method == 'POST':
+        t1 = request.form["d1"]
+        t2 = request.form["d2"]
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={t1}&end={t2}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+
     r = requests.get(URL)
     data = r.content
     data_dict = xmltodict.parse(data)
@@ -22,14 +34,17 @@ def hello_world():
         t = int(i[3:6]) / 60
         t = int(i[0:2]) + t
         dec_time.append("{:.1f}".format(t))
-        
-    plt.plot(dec_time, mag)
-    plt.savefig('static/Image/main.png')
-    min_mag, max_mag, total = min(mag), max(mag), len(mag)
+
+    fig = Figure()
+    ax = fig.subplots()
+    ax.plot(dec_time, mag)
+    fig.savefig('static/Image/main.png')    
+    min_mag, max_mag, total, last = min(mag), max(mag), len(mag), mag[:10]
     data = {
         'min_mag':min_mag,
         'max_mag':max_mag,
-        'total':total
+        'total':total,
+        'last':last
     }
     return render_template('main.html', data=data)
 
