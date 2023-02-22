@@ -1,20 +1,21 @@
 <html>
-<body style="align-items: center;">
-    <h1>Graph for the last 24 Hours</h1>
+<body>
+    <h1><a href="/">Home</a></h1>
+    <h1>Graph for {{data['selectDate']}}</h1>
     <img src="{{url_for('static', filename='/Image/main.png')}}" />
-    <h1>Min magnitude : {{data['min_mag']}}</h1>
-    <h1>Max magnitude : {{data['max_mag']}}</h1>
+    <h1>Min magnitude :</h1><h2>Magnitude : {{data['min_mag']['magnitude']['mag']['value']}}, time : {{data['min_mag']['origin']['time']['value'][11:16]}}, {{data['min_mag']['description']['text']}}</h2>
+    <h1>Max magnitude :</h1><h2>Magnitude : {{data['max_mag']['magnitude']['mag']['value']}}, time : {{data['max_mag']['origin']['time']['value'][11:16]}}, {{data['max_mag']['description']['text']}}</h2>
     <h1>Total Earthquakes : {{data['total']}}</h1>
     <form method="post">
-    From: <input type="datetime-local" name="d1"/>
-    <br/><br/>
-    To: <input type="datetime-local" name="d2"/>
+    From: <input type="date" name="date"/>
     <br/><br/>
     <button type="submit">Submit</button>
     </form>
+    {% if data['last'] %}
     <h1>last Earthquakes :</h1>
     {% for i in data['last'] %}
-    <h3>Magnitude : {{i['magnitude']['mag']['value']}}, time : {{i['origin']['time']['value']}}</h3>
+    <h3>Magnitude : {{i['magnitude']['mag']['value']}}, time : {{i['origin']['time']['value'][11:16]}}, {{i['description']['text']}} </h3>
     {% endfor %}
+    {% endif %}
 </body>
 </html>

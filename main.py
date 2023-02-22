@@ -9,17 +9,20 @@ from datetime import timedelta
 
 app = Flask(__name__)
 
-@app.route('/', methods = ['POST', 'GET'])
+@app.route('/',methods = ['POST', 'GET'])
 def mainView():
     if request.method == 'GET':
         t = datetime.now()
         today = date.today()
         yesterday = today - timedelta(days = 1)
-        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={yesterday}T{t.hour -2 }:{t.minute}&end={today}T{t.hour -3 }:{t.minute}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={yesterday}T{t.hour - 3 }:{t.minute}&end={today}T{t.hour -3 }:{t.minute}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+        selectDate = today
+
     elif request.method == 'POST':
-        t1 = request.form["d1"]
-        t2 = request.form["d2"]
-        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={t1}&end={t2}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+        t1 = request.form["date"]
+        t2 = t1.split('-')
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={t1}&end={t2[0]}-{t2[1]}-{int(t2[2])+1}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+        selectDate = t1
 
     r = requests.get(URL)
     data = r.content
@@ -38,13 +41,17 @@ def mainView():
     fig = Figure()
     ax = fig.subplots()
     ax.plot(dec_time, mag)
-    fig.savefig('static/Image/main.png')    
-    min_mag, max_mag, total, last = min(mag), max(mag), len(mag), data["q:quakeml"]["eventParameters"]["event"][:3]
+    fig.savefig('static/Image/main.png')
+    last = None
+    if request.method == 'GET':
+        last = data["q:quakeml"]["eventParameters"]["event"][:3]
+    min_mag, max_mag, total = data["q:quakeml"]["eventParameters"]["event"][mag.index(min(mag))], data["q:quakeml"]["eventParameters"]["event"][mag.index(max(mag))], len(mag)
     data = {
         'min_mag':min_mag,
         'max_mag':max_mag,
         'total':total,
-        'last':last
+        'last':last,
+        'selectDate':selectDate
     }
     return render_template('main.html', data=data)
 
