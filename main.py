@@ -6,9 +6,10 @@ from matplotlib.figure import Figure
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
+import io 
 
 app = Flask(__name__)
-app = Flask(__name__, static_url_path='/tmp')
+
 @app.route('/',methods = ['POST', 'GET'])
 def mainView():
     if request.method == 'GET':
@@ -41,12 +42,15 @@ def mainView():
     fig = Figure()
     ax = fig.subplots()
     ax.plot(dec_time, mag)
-    fig.savefig('tmp/Image/main.png')
+    img = io.BytesIO()
+    ax.savefig(img, format='png')
+    img.seek(0)
     last = None
     if request.method == 'GET':
         last = data["q:quakeml"]["eventParameters"]["event"][:3]
     min_mag, max_mag, total = data["q:quakeml"]["eventParameters"]["event"][mag.index(min(mag))], data["q:quakeml"]["eventParameters"]["event"][mag.index(max(mag))], len(mag)
     data = {
+        'img':img,
         'min_mag':min_mag,
         'max_mag':max_mag,
         'total':total,
