@@ -49,7 +49,7 @@ def mainView():
     image = 'data:image/png;base64,{data}'
     last = None
     if request.method == 'GET':
-        last = data["q:quakeml"]["eventParameters"]["event"][:3]
+        #last = data["q:quakeml"]["eventParameters"]["event"][:3]
     min_mag, max_mag, total = data["q:quakeml"]["eventParameters"]["event"][mag.index(min(mag))], data["q:quakeml"]["eventParameters"]["event"][mag.index(max(mag))], len(mag)
     data = {
         'img':image,
