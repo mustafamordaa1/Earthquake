@@ -41,7 +41,7 @@ def mainView():
     fig = Figure()
     ax = fig.subplots()
     ax.plot(dec_time, mag)
-    fig.savefig('static/Image/main.png')
+    fig.savefig('tmp/Image/main.png')
     last = None
     if request.method == 'GET':
         last = data["q:quakeml"]["eventParameters"]["event"][:3]
