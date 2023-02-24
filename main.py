@@ -8,7 +8,7 @@ from datetime import date
 from datetime import timedelta
 
 app = Flask(__name__)
-
+app = Flask(__name__, static_url_path='/tmp')
 @app.route('/',methods = ['POST', 'GET'])
 def mainView():
     if request.method == 'GET':
