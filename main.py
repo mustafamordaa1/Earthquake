@@ -56,5 +56,3 @@ def mainView():
     return render_template('main.html', data=data)
 
 
-if __name__ == '__main__':
-    app.run()
