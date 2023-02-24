@@ -7,6 +7,7 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 import io 
+import base64
 
 app = Flask(__name__)
 
@@ -43,14 +44,15 @@ def mainView():
     ax = fig.subplots()
     ax.plot(dec_time, mag)
     img = io.BytesIO()
-    ax.savefig(img, format='png')
-    img.seek(0)
+    fig.savefig(img, format="png")
+    data = base64.b64encode(img.getbuffer()).decode("ascii")
+    image = 'data:image/png;base64,{data}'
     last = None
     if request.method == 'GET':
         last = data["q:quakeml"]["eventParameters"]["event"][:3]
     min_mag, max_mag, total = data["q:quakeml"]["eventParameters"]["event"][mag.index(min(mag))], data["q:quakeml"]["eventParameters"]["event"][mag.index(max(mag))], len(mag)
     data = {
-        'img':img,
+        'img':image,
         'min_mag':min_mag,
         'max_mag':max_mag,
         'total':total,
