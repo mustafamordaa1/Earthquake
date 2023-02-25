@@ -46,7 +46,7 @@ def mainView():
     img = io.BytesIO()
     fig.savefig(img, format="png")
     Imgdata = base64.b64encode(img.getbuffer()).decode("ascii")
-    image = 'data:image/png;base64,{Imgdata}'
+    image = f'data:image/png;base64,{Imgdata}'
     last = None
     if request.method == 'GET':
         last = data["q:quakeml"]["eventParameters"]["event"][:3]
