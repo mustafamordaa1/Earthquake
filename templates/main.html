@@ -7,25 +7,28 @@
     </head>
     <body>
         <div class="container text-center bg-gray-400">
-          <div class="row justify-content-md-center">
-            <div class="col-md-auto">
+          <div class="d-flex flex-column mb-3">
+            <div class="p-2">
                 <h1><a href="/">Home</a></h1>
                 <h1>Graph for {{data['selectDate']}}</h1>
                 <img class="img-fluid" src="{{data['img']}}" />
+                <img class="img-fluid" src="total/img" />
             </div>
-            <div class="col-md-auto">
-                <h1>Min magnitude :</h1><h2>Magnitude : {{data['min_mag']['magnitude']['mag']['value']}}, time : {{data['min_mag']['origin']['time']['value'][11:16]}}, {{data['min_mag']['description']['text']}}</h2>
-                <h1>Max magnitude :</h1><h2>Magnitude : {{data['max_mag']['magnitude']['mag']['value']}}, time : {{data['max_mag']['origin']['time']['value'][11:16]}}, {{data['max_mag']['description']['text']}}</h2>
-                <h1>Total Earthquakes : {{data['total']}}</h1>
+            <div class="p-2">
+                <div class="alert alert-danger" role="alert">
+                    <h1>Min magnitude :</h1><h2>Magnitude : {{data['min_mag']['magnitude']['mag']['value']}}, time : {{data['min_mag']['origin']['time']['value'][11:16]}}, {{data['min_mag']['description']['text']}}</h2>
+                    <h1>Max magnitude :</h1><h2>Magnitude : {{data['max_mag']['magnitude']['mag']['value']}}, time : {{data['max_mag']['origin']['time']['value'][11:16]}}, {{data['max_mag']['description']['text']}}</h2>
+                    <h1>Total Earthquakes : {{data['total']}}</h1>
+                </div>
             </div>
-            <div class="col-md-auto">
+            <div class="p-2">
                 <form method="post">
                 From: <input type="date" name="date"/>
                 <br/><br/>
                 <button type="submit">Submit</button>
                 </form>
             </div>
-            <div class="col-md-auto">
+            <div class="p-2">
                 {% if data['last'] %}
                 <h1>last Earthquakes :</h1>
                 {% for i in data['last'] %}
