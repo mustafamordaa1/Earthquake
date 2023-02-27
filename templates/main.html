@@ -53,23 +53,10 @@
                 {% endif %}
             </div>
             
-
-            <div class="p-2">
-                <div class="alert alert-danger" role="alert">
-                    <h1>Min magnitude :</h1><h2>Magnitude : {{data['min_mag']['magnitude']['mag']['value']}}, time : {{data['min_mag']['origin']['time']['value'][11:16]}}, {{data['min_mag']['description']['text']}}</h2>
-                    <h1>Max magnitude :</h1><h2>Magnitude : {{data['max_mag']['magnitude']['mag']['value']}}, time : {{data['max_mag']['origin']['time']['value'][11:16]}}, {{data['max_mag']['description']['text']}}</h2>
-                    <h1>Total Earthquakes : {{data['total']}}</h1>
-                </div>
-            </div>
-            <div class="p-2">
-                <form method="post">
-                From: <input type="date" name="date"/>
-                <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
-            <div class="p-2">
-              {% if data['last'] %}
-              <table class="table">
+            {% if data['last'] %}
+            <div class="p-3 text-left" style="background-color:#e58f6f;color:white;">
+              <h1>Latest Earthquakes</h1>
+              <table class="table" style="color:white;">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -99,22 +86,57 @@
                   </tr>
                 </tbody>
               </table>
-                {% endif %}
             </div>
-          </div>
-        
+            {% endif %}
+
+            <div class="d-flex flex-column align-items-center" style="background-color:#836c6d;">
+                    <!--<div class="card" style="width: 23rem;">
+                      <img src="https://www.mapquestapi.com/staticmap/v5/map?locations={{data['min_mag']['origin']['longitude']['value']}}%2C{{data['min_mag']['origin']['latitude']['value']}}%7Cvia-ff0000-sm-sm&zoom=6&size=400%2C300%402x&type=map&key=PQCMDKpFJGfgajubdKoYdZdWT3tT7Sx6" class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <p class="card-text">
+                            Max Magnitude Earthquake was at {{data['min_mag']['origin']['time']['value'][11:16]}} UTC with {{data['min_mag']['magnitude']['mag']['value']}} magnitude and in {{data['min_mag']['description']['text']}}.
+                        </p>
+                      </div>
+                    </div>-->
+                    
+                    <div class="card my-2" style="width: 23rem;">
+                      <img src="https://www.mapquestapi.com/staticmap/v5/map?locations={{data['max_mag']['origin']['longitude']['value']}}%2C{{data['max_mag']['origin']['latitude']['value']}}%7Cvia-ff0000-sm-sm&zoom=6&size=400%2C300%402x&type=map&key=PQCMDKpFJGfgajubdKoYdZdWT3tT7Sx6" class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <p class="card-text">
+                            Max Magnitude Earthquake was at {{data['max_mag']['origin']['time']['value'][11:16]}} UTC with {{data['max_mag']['magnitude']['mag']['value']}} magnitude and in {{data['max_mag']['description']['text']}}.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div class="card my-2" style="width: 23rem;">
+                      <img src="https://www.mapquestapi.com/staticmap/v5/map?locations={{data['cordinates']}}%7Cvia-ff0000-sm&zoom=5&size=400%2C300%402x&type=map&key=PQCMDKpFJGfgajubdKoYdZdWT3tT7Sx6" class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <p class="card-text">
+                            Total Earthquakes : {{data['total']}}
+                        </p>
+                      </div>
+                    </div>
+            </div>
+            <div class="p-2">
+                <form method="post">
+                From: <input type="date" name="date"/>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
+        </div>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
         
         <script type="text/javascript">
         {% if data['last'] %}
           async function getTotalImage() {
-            let response = await fetch('https://earthquake-mustafamordaa1.vercel.app/graph?type=total')
+            let response = await fetch('http://127.0.0.1:5000/graph?type=total')
             let data = await response.json()
             return data;
           }  
           async function getTodayImage() {
-            let response = await fetch('https://earthquake-mustafamordaa1.vercel.app/graph?type=today')
+            let response = await fetch('http://127.0.0.1:5000/graph?type=today')
             let data = await response.json()
             return data;
           }  
@@ -122,7 +144,7 @@
           getTodayImage().then(data => document.getElementById("mainGraph").src = data['img'] );
         {% else %}
             async function getDateImage() {
-            let response = await fetch('https://earthquake-mustafamordaa1.vercel.app/graph?type=day&date={{data['selectDate']}}')
+            let response = await fetch('http://127.0.0.1:5000/graph?type=day&date={{data['selectDate']}}')
             let data = await response.json()
             return data;
           }  
