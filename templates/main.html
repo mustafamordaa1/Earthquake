@@ -131,12 +131,12 @@
         <script type="text/javascript">
         {% if data['last'] %}
           async function getTotalImage() {
-            let response = await fetch('http://127.0.0.1:5000/graph?type=total')
+            let response = await fetch('https://earthquake-mustafamordaa1.vercel.app/graph?type=total')
             let data = await response.json()
             return data;
           }  
           async function getTodayImage() {
-            let response = await fetch('http://127.0.0.1:5000/graph?type=today')
+            let response = await fetch('https://earthquake-mustafamordaa1.vercel.app/graph?type=today')
             let data = await response.json()
             return data;
           }  
@@ -144,7 +144,7 @@
           getTodayImage().then(data => document.getElementById("mainGraph").src = data['img'] );
         {% else %}
             async function getDateImage() {
-            let response = await fetch('http://127.0.0.1:5000/graph?type=day&date={{data['selectDate']}}')
+            let response = await fetch('https://earthquake-mustafamordaa1.vercel.app/graph?type=day&date={{data['selectDate']}}')
             let data = await response.json()
             return data;
           }  
