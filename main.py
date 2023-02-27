@@ -35,6 +35,12 @@ def mainView():
 
     time = [i["origin"]["time"]["value"][11:16] for i in data["q:quakeml"]["eventParameters"]["event"]]
     mag = [float(i["magnitude"]["mag"]["value"]) for i in data["q:quakeml"]["eventParameters"]["event"]]
+    cordinates = [[i['origin']['longitude']['value'], i['origin']['latitude']['value']] for i in data["q:quakeml"]["eventParameters"]["event"]]
+    h = []
+    for i in cordinates:
+        m = "%2C".join(i)
+        h.append(m)
+    cordinates = "%7Cvia-ff0000-sm||".join(h)
     dec_time =[]
     for i in time:
         t = int(i[3:6]) / 60
@@ -50,7 +56,8 @@ def mainView():
         'max_mag':max_mag,
         'total':total,
         'last':last,
-        'selectDate':selectDate
+        'selectDate':selectDate,
+        'cordinates': cordinates
     }
     return render_template('main.html', data=data)
 
@@ -114,7 +121,7 @@ def generateImg():
         t = datetime.now()
         today = date.today()
         yesterday = today - timedelta(days = 1)
-        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={yesterday}T{t.hour - 3 }:{t.minute}&end={today}T{t.hour -3 }:{t.minute}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={yesterday}T{t.hour - 3 }:{t.minute}&end={today}T{t.hour -3 }:{t.minute}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036&orderby=time-asc&minmag=0.5"
         r = requests.get(URL)
         data = r.content
         data_dict = xmltodict.parse(data)
