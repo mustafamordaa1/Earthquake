@@ -5,9 +5,12 @@
         <title>Earthquakes</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gloock&display=swap" rel="stylesheet">
     </head>
-    <body class="p-0">
-        <nav class="navbar navbar bg-body-tertiary">
+    <body>
+        <!--<nav class="navbar navbar bg-body-tertiary">
             <div class="container-fluid">
               <a class="navbar-brand" href="#">Earthquakes Graphed</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,31 +27,32 @@
                 </ul>
               </div>
             </div>
-          </nav>
+          </nav>-->
 
           <div class="d-flex flex-column text-center">
-
-            <div class="row" style="background-color: #fdf1d3;">
-              <div class="col p-5" style="color:#292434;">
-                <h1>Earthquakes Graphed</h1>
-              </div>
-              <div class="col">
-                <img class="img-fluid float-end" width="550" src="{{url_for('static', filename='Image/hero.png')}}" />
-              </div>
-            </div>
-
-            <div class="container text-center m-0 p-2" style="background-color: #416365;">
-                <div class="row">
-                  <div class="col">
-                    <h1>Graph for {{data['selectDate']}}</h1>
-                    <img class="img-fluid" src="{{data['img']}}" />
+            <div class="container text-center">
+                <div class="row p-0" style="background-color: #fdf1d3;">
+                  <div class="col-6 p-5" style="color:#292434;">
+                    <h1>Earthquakes Graphed</h1>
                   </div>
-                  <div class="col">
-                    <h1>Earthquakes in the last 7 days</h1>
-                    <img id="total" class="img-fluid" src="{{url_for('static', filename='Loading_icon.gif')}}" />
+                  <div class="col-6">
+                    <img class="img-fluid float-end" src="{{url_for('static', filename='Image/hero.png')}}" />
                   </div>
                 </div>
             </div>
+            <div class="container text-center p-2" style="color: white;background-color: #416365;">
+                <div class="p-3">
+                    <h1>Graph for {{data['selectDate']}}</h1>
+                    <img id="mainGraph" class="img-fluid" src="{{url_for('static', filename='Loading_icon.gif')}}" />
+                </div>
+                {% if data['last'] %}
+                <div class="p-3" style="background-color: #416365;">
+                    <h1>Earthquakes in the last 7 days</h1>
+                    <img id="total" class="img-fluid" src="{{url_for('static', filename='Loading_icon.gif')}}" />
+                </div>
+                {% endif %}
+            </div>
+            
 
             <div class="p-2">
                 <div class="alert alert-danger" role="alert">
@@ -75,14 +79,24 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for i in data['last'] %}
                   <tr>
                     <th scope="row">1</th>
-                    <td>{{i['magnitude']['mag']['value']}}</td>
-                    <td>{{i['origin']['time']['value'][11:16]}}</td>
-                    <td>{{i['description']['text']}}</td>
+                    <td>{{data['last'][0]['magnitude']['mag']['value']}}</td>
+                    <td>{{data['last'][0]['origin']['time']['value'][11:16]}}</td>
+                    <td>{{data['last'][0]['description']['text']}}</td>
                   </tr>
-                  {% endfor %}
+                  <tr>
+                    <th scope="row">2</th>
+                    <td>{{data['last'][1]['magnitude']['mag']['value']}}</td>
+                    <td>{{data['last'][1]['origin']['time']['value'][11:16]}}</td>
+                    <td>{{data['last'][1]['description']['text']}}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">3</th>
+                    <td>{{data['last'][2]['magnitude']['mag']['value']}}</td>
+                    <td>{{data['last'][2]['origin']['time']['value'][11:16]}}</td>
+                    <td>{{data['last'][2]['description']['text']}}</td>
+                  </tr>
                 </tbody>
               </table>
                 {% endif %}
@@ -93,14 +107,27 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
         
         <script type="text/javascript">
-
-          async function getImage() {
-            let response = await fetch('http://127.0.0.1:5000/graph/total')
+        {% if data['last'] %}
+          async function getTotalImage() {
+            let response = await fetch('http://127.0.0.1:5000/graph?type=total')
             let data = await response.json()
             return data;
           }  
-          getImage().then(data => document.getElementById("total").src = data['img'] );
-
+          async function getTodayImage() {
+            let response = await fetch('http://127.0.0.1:5000/graph?type=today')
+            let data = await response.json()
+            return data;
+          }  
+          getTotalImage().then(data => document.getElementById("total").src = data['img'] );
+          getTodayImage().then(data => document.getElementById("mainGraph").src = data['img'] );
+        {% else %}
+            async function getDateImage() {
+            let response = await fetch('http://127.0.0.1:5000/graph?type=day&date={{data['selectDate']}}')
+            let data = await response.json()
+            return data;
+          }  
+          getDateImage().then(data => document.getElementById("mainGraph").src = data['img'] );
+        {% endif %}
         </script>
     </body>
 </html>
