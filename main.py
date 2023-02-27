@@ -41,19 +41,11 @@ def mainView():
         t = int(i[0:2]) + t
         dec_time.append("{:.1f}".format(t))
         
-    fig = Figure()
-    ax = fig.subplots()
-    ax.plot(dec_time, mag, linewidth=0.8)
-    img = io.BytesIO()
-    fig.savefig(img, format="png")
-    Imgdata = base64.b64encode(img.getbuffer()).decode("ascii")
-    image = f'data:image/png;base64,{Imgdata}'
     last = None
     if request.method == 'GET':
         last = data["q:quakeml"]["eventParameters"]["event"][:3]
     min_mag, max_mag, total = data["q:quakeml"]["eventParameters"]["event"][mag.index(min(mag))], data["q:quakeml"]["eventParameters"]["event"][mag.index(max(mag))], len(mag)
     data = {
-        'img':image,
         'min_mag':min_mag,
         'max_mag':max_mag,
         'total':total,
@@ -62,8 +54,9 @@ def mainView():
     }
     return render_template('main.html', data=data)
 
-@app.route('/graph/<type>',methods = [ 'GET'])
-def generateImg(type):
+@app.route('/graph',methods = [ 'GET'])
+def generateImg():
+    type = request.args.get('type')
     if type == "total":
         total = []
         days = []
@@ -90,8 +83,62 @@ def generateImg(type):
         fig.savefig(img, format="png")
         Imgdata = base64.b64encode(img.getbuffer()).decode("ascii")
         image = f'data:image/png;base64,{Imgdata}'
-
-        return {'img': image}
+    
+    elif type == "day":
+        t1 = request.args.get('date')
+        t2 = t1.split('-')
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={t1}T00:00&end={t2[0]}-{t2[1]}-{int(t2[2])+1}T00:00&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036&orderby=time-asc&minmag=0.5"
+        r = requests.get(URL)
+        data = r.content
+        data_dict = xmltodict.parse(data)
+        json_data = json.dumps(data_dict)
+        data = json.loads(json_data)
+    
+        time = [i["origin"]["time"]["value"][11:16] for i in data["q:quakeml"]["eventParameters"]["event"]]
+        mag = [float(i["magnitude"]["mag"]["value"]) for i in data["q:quakeml"]["eventParameters"]["event"]]
+        dec_time =[]
+        for i in time:
+            t = int(i[3:6]) / 60
+            t = int(i[0:2]) + t
+            dec_time.append("{:.1f}".format(t))
+            
+        fig = Figure()
+        ax = fig.subplots()
+        ax.plot(dec_time, mag, linewidth=0.8)
+        img = io.BytesIO()
+        fig.savefig(img, format="png")
+        Imgdata = base64.b64encode(img.getbuffer()).decode("ascii")
+        image = f'data:image/png;base64,{Imgdata}'
+        
+    elif type == "today":
+        t = datetime.now()
+        today = date.today()
+        yesterday = today - timedelta(days = 1)
+        URL = f"https://www.seismicportal.eu/fdsnws/event/1/query?start={yesterday}T{t.hour - 3 }:{t.minute}&end={today}T{t.hour -3 }:{t.minute}&minlat=42.240172&maxlat=29.588440&minlon=28.533673&maxlon=49.348036"
+        r = requests.get(URL)
+        data = r.content
+        data_dict = xmltodict.parse(data)
+        json_data = json.dumps(data_dict)
+        data = json.loads(json_data)
+    
+        time = [i["origin"]["time"]["value"][11:16] for i in data["q:quakeml"]["eventParameters"]["event"]]
+        mag = [float(i["magnitude"]["mag"]["value"]) for i in data["q:quakeml"]["eventParameters"]["event"]]
+        dec_time =[]
+        for i in time:
+            t = int(i[3:6]) / 60
+            t = int(i[0:2]) + t
+            dec_time.append("{:.1f}".format(t))
+            
+        fig = Figure()
+        ax = fig.subplots()
+        ax.plot(dec_time, mag, linewidth=0.8)
+        img = io.BytesIO()
+        fig.savefig(img, format="png")
+        Imgdata = base64.b64encode(img.getbuffer()).decode("ascii")
+        image = f'data:image/png;base64,{Imgdata}'
+        
+    
+    return {'img': image}
 	
 
 if __name__ == '__main__':
